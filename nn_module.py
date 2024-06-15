@@ -64,6 +64,20 @@ class DML(nn.Module):
         out = self.get_embeddings(batch)
         return self.last_layer(out)
     
+    def get_data_hidden_states(self, data_loader, device):
+        self.eval()
+        self.to(device)
+        
+        with torch.no_grad():
+            image_hidden_states = []
+            for batch in data_loader:
+                image_hidden_states.append(self.get_embeddings(batch[0].to(device)).cpu())
+
+            image_hidden_states = torch.cat(image_hidden_states)
+        
+        return image_hidden_states
+                    
+        
     def get_predict(self, data_loader, device):
         self.eval()
         self.to(device)
