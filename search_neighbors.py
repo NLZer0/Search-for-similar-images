@@ -32,6 +32,7 @@ if __name__ == '__main__':
     down_height = global_params['down_height']
     embedding_size = global_params['embedding_size']
     class_targets = global_params['class_targets']
+    target_classes = global_params['target_classes']
     n_classes = global_params['n_classes']
     
     try:
@@ -76,11 +77,18 @@ if __name__ == '__main__':
 
     with torch.no_grad():
         img_hidden_state = model.get_embeddings(img1.unsqueeze(0).to(device)).cpu()
-    similarity = cosine_similarity(img_hidden_state, images_hidden_states)
+        img_class_predict = model(img1.unsqueeze(0).to(device)).cpu()[0]
+        img_class_predict = torch.argmax(img_class_predict)
+        class_str = target_classes[img_class_predict.item()]
+    
+    print(f'Класс объекта: {class_str}')
+
+    class_mask = targets == img_class_predict
+    similarity = cosine_similarity(img_hidden_state, images_hidden_states[class_mask])
     
     # Ищем похожие изображение на среднее первых верхних при первичном ранжировании 
     similar_imgs_hidden_state = images_hidden_states[torch.argsort(similarity)[-5:]]
-    similarity = cosine_similarity(similar_imgs_hidden_state.mean(dim=0), images_hidden_states)
+    similarity = cosine_similarity(similar_imgs_hidden_state.mean(dim=0), images_hidden_states[class_mask])
 
     plt.figure()
     plt.title('Оригинальное изображение')

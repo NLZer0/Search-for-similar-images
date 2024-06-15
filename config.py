@@ -11,5 +11,14 @@ global_params = {
         'other': 4, 
         'shoes': 5,
         'upper_body': 6
+    },
+    'target_classes': {
+        0: 'bags',
+        1: 'full_body', 
+        2: 'glasses',
+        3: 'lower_body',
+        4: 'other', 
+        5: 'shoes',
+        6: 'upper_body'
     }
 }
