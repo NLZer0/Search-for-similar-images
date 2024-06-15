@@ -2,11 +2,11 @@ import torchvision
 import torch 
 from torch import nn
 import torch.nn.functional as F
-
+from torch.utils.data import DataLoader, TensorDataset
 
 class CosineComponent(nn.Module):
     
-    def __init__(self, embedding_size, n_classes):
+    def __init__(self, embedding_size:int, n_classes:int):
         super().__init__()
         self.W = nn.Parameter(torch.Tensor(embedding_size, n_classes))
         nn.init.kaiming_uniform_(self.W)
@@ -16,7 +16,7 @@ class CosineComponent(nn.Module):
         W_norm = F.normalize(self.W, dim=0)
         return x_norm @ W_norm
 
-def arcface_loss(cosine, target, n_classes, m=.4):
+def arcface_loss(cosine:torch.Tensor, target:torch.Tensor, n_classes:int, m:float=.4):
         
     cosine = cosine.clip(-1+1e-7, 1-1e-7) 
     arcosine = cosine.arccos()
@@ -27,7 +27,7 @@ def arcface_loss(cosine, target, n_classes, m=.4):
 
     
 class DML(nn.Module):
-    def __init__(self, embedding_size, n_classes, dropout=0.1) -> None:
+    def __init__(self, embedding_size:int, n_classes:int, dropout:float=0.1) -> None:
         super(DML, self).__init__()
         
         self.pretrain_resnet = torchvision.models.resnet18(pretrained=True)
@@ -52,19 +52,19 @@ class DML(nn.Module):
         #     nn.Softmax(dim=1)
         # )
         
-    def get_pretrain_embeddings(self, batch):
+    def get_pretrain_embeddings(self, batch:torch.Tensor):
         with torch.no_grad():
             return self.pretrain_resnet(batch)
         
-    def get_embeddings(self, batch):
+    def get_embeddings(self, batch:torch.Tensor):
         out = self.get_pretrain_embeddings(batch)
         return self.ffwd_model(out)
 
-    def forward(self, batch):
+    def forward(self, batch:torch.Tensor):
         out = self.get_embeddings(batch)
         return self.last_layer(out)
     
-    def get_data_hidden_states(self, data_loader, device):
+    def get_data_hidden_states(self, data_loader:DataLoader, device:torch.device):
         self.eval()
         self.to(device)
         
@@ -78,7 +78,7 @@ class DML(nn.Module):
         return image_hidden_states
                     
         
-    def get_predict(self, data_loader, device):
+    def get_predict(self, data_loader:DataLoader, device:torch.device):
         self.eval()
         self.to(device)
         
