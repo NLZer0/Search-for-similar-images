@@ -95,7 +95,7 @@ if __name__ == '__main__':
     plt.imshow((img1.permute(1,2,0)).numpy().astype(int))
     
     fig, ax = plt.subplots(nrows=n_neighbors, figsize=(12,16))
-    for i, img in enumerate(images[torch.argsort(similarity)[-n_neighbors:]]):
+    for i, img in enumerate(images[class_mask][torch.argsort(similarity)[-n_neighbors:]]):
         ax[i].imshow((img.permute(1,2,0)).numpy().astype(int))
     
     plt.show()
