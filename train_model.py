@@ -1,7 +1,6 @@
 import os
 import argparse
 
-
 import cv2
 import torch 
 from tqdm import tqdm 
