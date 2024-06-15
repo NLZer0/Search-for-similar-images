@@ -7,22 +7,25 @@ import torch
 from tqdm import tqdm 
 from torch.utils.data import DataLoader, TensorDataset
 
+from config import global_params
 from nn_module import DML, arcface_loss
-
-parser = argparse.ArgumentParser()
-parser.add_argument('train_data_folder', type=str, help='Путь к директории для обучения')
-parser.add_argument('model_path', type=str, help='Директория для сохранения обученной модели')
-
-args = parser.parse_args()
-train_data_folder = args['train_data_folder']
-model_path = args['model_path']
 
 if __name__ == '__main__':
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument('train_data_folder', type=str, help='Путь к директории для обучения')
+    parser.add_argument('model_path', type=str, help='Путь для сохранения обученной модели')
 
-    down_width = 720  
-    down_height = 720 
+    args = parser.parse_args()
 
+    train_data_folder = args.train_data_folder
+    model_path = args.model_path
+    
+    down_width = global_params['down_width']
+    down_height = global_params['down_height']
+    embedding_size = global_params['embedding_size']
+    
     images = []
     targets = []
     folder_names = os.listdir(f'{train_data_folder}')
@@ -40,11 +43,10 @@ if __name__ == '__main__':
     images = images.permute(0, 3, 1, 2)
     targets = torch.LongTensor(targets)
 
-
     n_classes = len(class_targets)
 
     data_size = images.shape[0]
-    train_size = 0.7
+    train_size = 0.85
 
     all_idx = torch.randperm(data_size)
     train_idx = all_idx[:int(data_size*train_size)]
@@ -57,7 +59,7 @@ if __name__ == '__main__':
     test_data_loader = DataLoader(test_data, batch_size=10, shuffle=True)
 
 
-    model = DML(embedding_size=128, n_classes=n_classes)
+    model = DML(embedding_size=embedding_size, n_classes=n_classes)
     model.to(device)
 
     optim = torch.optim.Adam(model.parameters(), lr=1)
