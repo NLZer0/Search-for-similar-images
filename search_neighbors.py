@@ -31,9 +31,11 @@ if __name__ == '__main__':
     down_width = global_params['down_width']
     down_height = global_params['down_height']
     embedding_size = global_params['embedding_size']
+    class_targets = global_params['class_targets']
+    n_classes = global_params['n_classes']
     
     try:
-        model = DML(embedding_size=embedding_size, n_classes=7)
+        model = DML(embedding_size=embedding_size, n_classes=n_classes)
         
         if model_path is None:
             print('\nОбучение модели\n')
@@ -51,8 +53,6 @@ if __name__ == '__main__':
     images = []
     targets = []
     folder_names = os.listdir(train_data_folder)
-
-    class_targets = dict(zip(folder_names, range(len(folder_names))))
     
     for folder in folder_names:
         for img_name in os.listdir(f'{train_data_folder}/{folder}'):

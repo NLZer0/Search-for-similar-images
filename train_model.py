@@ -25,12 +25,13 @@ if __name__ == '__main__':
     down_width = global_params['down_width']
     down_height = global_params['down_height']
     embedding_size = global_params['embedding_size']
+    class_targets = global_params['class_targets']
+    n_classes = global_params['n_classes']
     
     images = []
     targets = []
     folder_names = os.listdir(f'{train_data_folder}')
 
-    class_targets = dict(zip(folder_names, range(len(folder_names))))
     
     for folder in folder_names:
         for img_name in os.listdir(f'{train_data_folder}/{folder}'):
@@ -42,8 +43,6 @@ if __name__ == '__main__':
     images = torch.cat(images, axis=0)
     images = images.permute(0, 3, 1, 2)
     targets = torch.LongTensor(targets)
-
-    n_classes = len(class_targets)
 
     data_size = images.shape[0]
     train_size = 0.85
@@ -64,7 +63,6 @@ if __name__ == '__main__':
 
     optim = torch.optim.Adam(model.parameters(), lr=1)
     loss_history = []
-
 
     lr = 1e-3
     n_epochs = 100
