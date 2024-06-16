@@ -7,7 +7,6 @@ import torchvision
 from torch.utils.data import DataLoader, TensorDataset
 from torch.nn.functional import cosine_similarity
 
-from PIL import Image
 import numpy as np
 import gradio as gr
 
@@ -76,7 +75,7 @@ if __name__ == '__main__':
         model_path = 'model.pt'
 
     print('\nЗагрузка модели\n')
-    checkpoint = torch.load(model_path)
+    checkpoint = torch.load(model_path, map_location='cpu')
     model.load_state_dict(checkpoint['model_state_dict'])
     model.to(device)
 
