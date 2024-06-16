@@ -1,6 +1,6 @@
 global_params = {
-    'down_width': 720,
-    'down_height': 720,
+    'down_width': 360,
+    'down_height': 360,
     'embedding_size': 128,
     'n_classes': 7,
     'class_targets': {

@@ -1,8 +1,9 @@
 import torchvision
+from torchvision.models import ResNet18_Weights
 import torch 
 from torch import nn
 import torch.nn.functional as F
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import DataLoader
 
 class CosineComponent(nn.Module):
     
@@ -30,7 +31,8 @@ class DML(nn.Module):
     def __init__(self, embedding_size:int, n_classes:int, dropout:float=0.1) -> None:
         super(DML, self).__init__()
         
-        self.pretrain_resnet = torchvision.models.resnet18(pretrained=True)
+        self.pretrain_resnet = torchvision.models.resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)
+        # self.pretrain_resnet = torchvision.models.resnet18(pretrained=True)
         input_embedding_size = self.pretrain_resnet.fc.out_features
         self.pretrain_resnet = torch.nn.DataParallel(self.pretrain_resnet)
         
