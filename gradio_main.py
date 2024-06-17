@@ -40,7 +40,7 @@ def find_similar_images(input_image, num_images:float, find_into_class:bool):
     similarity = cosine_similarity(img_hidden_state, images_hidden_states[class_mask])
     
     # Ищем похожие изображение на среднее первых верхних при первичном ранжировании 
-    similar_imgs_hidden_state = images_hidden_states[torch.argsort(similarity, descending=True)[:num_images]]
+    similar_imgs_hidden_state = images_hidden_states[class_mask][torch.argsort(similarity, descending=True)[:num_images]]
     similarity = cosine_similarity(similar_imgs_hidden_state.mean(dim=0), images_hidden_states[class_mask])
     
     neighbor_img_idx = torch.argsort(similarity, descending=True)[:num_images]
