@@ -27,24 +27,21 @@ if __name__ == '__main__':
     train_data_folder = args.train_data_folder
     model_path = args.model_path
 
-    # train_data_folder = 'test_data'
-    # model_path = 'model.pt'
-
     down_width = global_params['down_width']
     down_height = global_params['down_height']
     embedding_size = global_params['embedding_size']
     n_classes = global_params['n_classes']
     
-    train_data_loader, valid_data_loader = tools.load_data(train_data_folder, config=global_params, batch_size=10)
+    train_data_loader, valid_data_loader = tools.load_train_valid(train_data_folder, config=global_params, batch_size=10)
 
-    model = DML(embedding_size=embedding_size, n_classes=n_classes)
+    model = torch.jit.script(DML(embedding_size=embedding_size, n_classes=n_classes))
     model.to(device)
 
     optim = torch.optim.Adam(model.parameters(), lr=1)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optim, mode='max', factor=0.5, patience=10)
 
     lr = 1e-3
-    n_epochs = 20
+    n_epochs = 10
     batch_n = len(train_data_loader)
 
     for g in optim.param_groups:
@@ -63,8 +60,8 @@ if __name__ == '__main__':
             loss.backward()
             optim.step()
         
-        train_predict, train_target = model.get_predict(train_data_loader, device)
-        valid_predict, valid_target = model.get_predict(valid_data_loader, device)
+        train_predict, train_target = tools.get_predict(model, train_data_loader, device)
+        valid_predict, valid_target = tools.get_predict(model, valid_data_loader, device)
         
         train_target = train_target.cpu()
         valid_target = valid_target.cpu()
@@ -82,8 +79,8 @@ if __name__ == '__main__':
             print(f'Train Balanced Accuracy: {train_metric:.3f}')
             print(f'Valid Balanced Accuracy: {valid_metric:.3f}\n')
                 
-    torch.save({
-        'model_state_dict': model.state_dict(),
-        'optimizer_state_dict': optim.state_dict(),
-        }, model_path
+    torch.jit.save(
+        model,
+        model_path,
+
     )
